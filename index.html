@@ -17,6 +17,9 @@ header{background:var(--green);color:#fff;padding:28px 18px 70px;text-align:cent
 header h1{font:700 28px/1.15 Fraunces,Georgia,serif;margin:6px 0 4px;letter-spacing:.2px}
 header p{margin:0;opacity:.85;font-size:14px}
 header .stars{position:absolute;inset:0;pointer-events:none;opacity:.18}
+.menus{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px;position:relative}
+.menus a{color:#fff;text-decoration:none;font-weight:600;font-size:13.5px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3)}
+.menus a:hover{background:rgba(255,255,255,.24)}
 .wrap{max-width:720px;margin:-52px auto 40px;padding:0 14px;position:relative}
 .tabs{display:flex;gap:6px;background:var(--card);border-radius:14px;padding:5px;box-shadow:0 4px 18px rgba(0,0,0,.08);margin-bottom:16px}
 .tabs button{flex:1;border:0;background:transparent;padding:11px 8px;border-radius:10px;font:600 14px Inter;color:var(--muted);cursor:pointer}
@@ -79,6 +82,11 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
   <div style="font-size:26px">🎄</div>
   <h1>Christmas Dinner</h1>
   <p>Pick a starter, main and pudding for everyone in your family</p>
+  <nav class="menus" aria-label="View the menus">
+    <a href="menus/festive-menu.jpg" target="_blank" rel="noopener">📜 Festive Menu</a>
+    <a href="menus/childrens-festive-menu.pdf" target="_blank" rel="noopener">🎄 Children's Festive Menu</a>
+    <a href="menus/kids-menu.pdf" target="_blank" rel="noopener">🍟 Kids Menu</a>
+  </nav>
 </header>
 
 <div class="wrap">
