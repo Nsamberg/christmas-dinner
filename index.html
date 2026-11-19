@@ -89,6 +89,11 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 
   <!-- FORM -->
   <section id="view-form">
+    <div class="card" id="pickCard">
+      <label class="f" for="famPick">Already sent your choices?</label>
+      <select id="famPick"><option value="">➕ New family</option></select>
+      <div class="muted" style="margin-top:6px" id="pickHint">Pick your family to see and change your choices – from any phone or computer.</div>
+    </div>
     <div class="card">
       <label class="f" for="famName">Family name</label>
       <input type="text" id="famName" placeholder="e.g. The Smiths" autocomplete="off">
@@ -223,7 +228,8 @@ for (const [mk,m] of Object.entries(MENUS)) for (const [ck,list] of Object.entri
 
 // ---------- STATE ----------
 let fam = blankFamily();
-let editingId = null;          // db doc id when editing a saved family
+let currentId = null;          // id of the saved family being edited (null = new family)
+let familyNames = [];
 let allFamilies = [];
 function blankFamily(){ return {family:"", people:[newPerson("adult")], sides:{}}; }
 function newPerson(kind){ return {name:"", kind, menu: kind==="child" ? "festive" : "adult", starter:"", main:"", pudding:"", notes:""}; }
@@ -324,7 +330,7 @@ $("sides").addEventListener("click", e => {
 });
 $("addChild").onclick = () => { fam.people.push(newPerson("child")); renderForm(); };
 $("addAdult").onclick = () => { fam.people.push(newPerson("adult")); renderForm(); };
-$("newFamBtn").onclick = () => { fam = blankFamily(); editingId = null; if (!pin) { mine = null; try { localStorage.removeItem("xmas-mine"); } catch(e){} } $("saveBtn").textContent = "Send our choices"; status("formStatus",""); $("newFamBtn").classList.add("hidden"); renderForm(); window.scrollTo(0,0); };
+$("newFamBtn").onclick = () => { openFamily(""); window.scrollTo(0,0); };
 
 // tabs
 function show(which){
@@ -349,7 +355,34 @@ function cleanFamily(o){
 // ---- Google Sheet backend ----
 const API = (window.XMAS_CONFIG && window.XMAS_CONFIG.apiUrl) || "";
 let pin = ""; try { pin = localStorage.getItem("xmas-pin") || ""; } catch(e){}
-let mine = null; try { mine = JSON.parse(localStorage.getItem("xmas-mine") || "null"); } catch(e){}
+try { currentId = localStorage.getItem("xmas-current") || null; } catch(e){}
+function setCurrent(id){ currentId = id || null; try { id ? localStorage.setItem("xmas-current", id) : localStorage.removeItem("xmas-current"); } catch(e){} updateButtons(); }
+function updateButtons(){
+  $("saveBtn").textContent = currentId ? "Update our choices" : "Send our choices";
+  $("newFamBtn").classList.toggle("hidden", !currentId);
+  if ($("famPick").value !== (currentId||"")) $("famPick").value = currentId || "";
+}
+async function loadFamilyNames(){
+  try {
+    const r = await api({action:"families"});
+    familyNames = (r.families||[]).map(f=>({id:String(f.id), family:String(f.family||"")})).sort((a,b)=>a.family.localeCompare(b.family));
+    const sel = $("famPick");
+    sel.innerHTML = `<option value="">➕ New family</option>` + familyNames.map(f=>`<option value="${esc(f.id)}">${esc(f.family||"(no name)")}</option>`).join("");
+    if (currentId && !familyNames.some(f=>f.id===currentId)) { setCurrent(null); }
+    updateButtons();
+  } catch(e){ $("pickHint").textContent = "Couldn't load the list of families just now."; }
+}
+async function openFamily(id){
+  if (!id) { fam = blankFamily(); setCurrent(null); status("formStatus",""); renderForm(); return; }
+  $("famPick").disabled = true; $("pickHint").textContent = "Loading…";
+  try {
+    const r = await api({action:"get", id});
+    fam = cleanFamily(r.data||{}); setCurrent(id); renderForm();
+    status("formStatus", `These are the choices saved for ${esc(fam.family)}. Change anything and press <b>Update our choices</b>.`);
+  } catch(e){ status("formStatus", failText(e), "err"); updateButtons(); }
+  $("famPick").disabled = false; $("pickHint").textContent = "Pick your family to see and change your choices – from any phone or computer.";
+}
+$("famPick").addEventListener("change", e => openFamily(e.target.value));
 async function api(body){
   if (!API) throw {error:"not_configured"};
   let r;
@@ -367,24 +400,26 @@ function summaryText(f){
 function failText(e){
   if (e && e.error==="not_configured") return "The website isn't connected to the sheet yet – please tell the organiser.";
   if (e && e.error==="network") return "Couldn't reach the server. Check your connection and try again.";
-  if (e && (e.error==="denied"||e.error==="not_found")) return "This entry was changed by the organiser – start a new family or ask them to edit it.";
+  if (e && e.error==="not_found") { setCurrent(null); loadFamilyNames(); return "That family isn't on the list any more – please send your choices again as a new family."; }
   return "Something went wrong saving. Please try again.";
 }
 $("saveBtn").onclick = async () => {
   const m = missing(); if (m.length) { status("formStatus", "Still to fill in: " + esc(m.join(", ")), "err"); return; }
   const clean = cleanFamily(fam);
   const body = {action:"save", data:clean, summary:summaryText(clean)};
-  if (editingId) { body.id = editingId; body.pin = pin; }            // organiser editing any family
-  else if (mine && mine.id) { body.id = mine.id; body.token = mine.token; }  // family updating their own
+  if (currentId) body.id = currentId;
+  else {
+    const dup = familyNames.find(f => normName(f.family) === normName(clean.family));
+    if (dup) { status("formStatus", `${esc(dup.family)} has already sent choices. Choose <b>${esc(dup.family)}</b> in the list at the top to change them, or use a different family name.`, "err"); window.scrollTo(0,0); return; }
+  }
   $("saveBtn").disabled = true; $("saveBtn").textContent = "Sending…";
   try {
     const r = await api(body);
-    if (!editingId) { mine = {id:r.id, token:r.token}; try { localStorage.setItem("xmas-mine", JSON.stringify(mine)); } catch(e){} }
-    status("formStatus", `Thank you! Choices for ${esc(clean.family)} have been sent ✓<br><span class="muted">Need to change something? Come back on this phone, edit and send again.</span>`, "ok");
-    $("newFamBtn").classList.remove("hidden");
+    setCurrent(r.id); loadFamilyNames();
+    status("formStatus", `Thank you! Choices for ${esc(clean.family)} have been sent ✓<br><span class="muted">Need to change something? Open this page on any phone, pick your family at the top, and update.</span>`, "ok");
     if (pin) loadAll();
   } catch(e){ status("formStatus", failText(e), "err"); }
-  $("saveBtn").disabled = false; $("saveBtn").textContent = (mine && !editingId) ? "Update our choices" : "Send our choices";
+  $("saveBtn").disabled = false; updateButtons();
 };
 $("pinBtn").onclick = async () => {
   const p = $("pinInput").value.trim(); if (!p) return;
@@ -448,11 +483,11 @@ $("famList").addEventListener("click", async e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.edit) {
     const f = allFamilies.find(x=>x.id===b.dataset.edit); if (!f) return;
-    fam = JSON.parse(JSON.stringify({family:f.family, people:f.people, sides:f.sides||{}})); editingId = f.id;
-    renderForm(); show("form"); status("formStatus", `Editing ${esc(f.family)} – press Send when done.`); $("newFamBtn").classList.remove("hidden"); window.scrollTo(0,0);
+    fam = JSON.parse(JSON.stringify({family:f.family, people:f.people, sides:f.sides||{}})); setCurrent(f.id);
+    renderForm(); show("form"); status("formStatus", `Editing ${esc(f.family)} – press Update when done.`); window.scrollTo(0,0);
   }
   if (b.dataset.rm) {
-    if (b.dataset.sure) { try { await api({action:"delete", id:b.dataset.rm, pin}); toast("Removed"); loadAll(); } catch(err){ toast(failText(err)); } }
+    if (b.dataset.sure) { try { await api({action:"delete", id:b.dataset.rm, pin}); toast("Removed"); loadAll(); loadFamilyNames(); } catch(err){ toast(failText(err)); } }
     else { b.dataset.sure = "1"; b.textContent = "Sure?"; b.style.color = "var(--red)"; setTimeout(()=>{ b.dataset.sure=""; b.textContent="Remove"; b.style.color=""; }, 3000); }
   }
 });
@@ -484,7 +519,8 @@ $("copyOrder").onclick = async () => { try { await navigator.clipboard.writeText
 // ---------- BOOT ----------
 renderForm();
 applyAccess();
-if (mine) $("saveBtn").textContent = "Update our choices";
+updateButtons();
+if (API) loadFamilyNames();
 if (pin) loadAll();
 if (!API) status("formStatus", "Not connected to the sheet yet.", "err");
 </script>
