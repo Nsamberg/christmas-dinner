@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Christmas Dinner – Meal Choices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#1f4a3a; --green-2:#2c6150; --red:#a3282c; --cream:#fbf6ec; --card:#ffffff;
+  --ink:#1d2622; --muted:#6a746f; --line:#e6dfd0; --gold:#c49a3c; --soft:#f3ecdc;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
+header{background:var(--green);color:#fff;padding:28px 18px 70px;text-align:center;position:relative;overflow:hidden}
+header h1{font:700 28px/1.15 Fraunces,Georgia,serif;margin:6px 0 4px;letter-spacing:.2px}
+header p{margin:0;opacity:.85;font-size:14px}
+header .stars{position:absolute;inset:0;pointer-events:none;opacity:.18}
+.wrap{max-width:720px;margin:-52px auto 40px;padding:0 14px;position:relative}
+.tabs{display:flex;gap:6px;background:var(--card);border-radius:14px;padding:5px;box-shadow:0 4px 18px rgba(0,0,0,.08);margin-bottom:16px}
+.tabs button{flex:1;border:0;background:transparent;padding:11px 8px;border-radius:10px;font:600 14px Inter;color:var(--muted);cursor:pointer}
+.tabs button.on{background:var(--green);color:#fff}
+.card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:14px;border:1px solid var(--line)}
+label.f{display:block;font-weight:600;font-size:13px;margin:0 0 5px;color:var(--green)}
+input[type=text],textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:15px Inter;background:#fff;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--gold);outline-offset:0;border-color:transparent}
+.person{border-left:4px solid var(--red)}
+.person-head{display:flex;gap:8px;align-items:flex-end;margin-bottom:12px}
+.person-head .grow{flex:1}
+.x{border:0;background:var(--soft);color:var(--red);width:40px;height:44px;border-radius:10px;font-size:20px;cursor:pointer}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.seg button{flex:1 1 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font:500 13px Inter;cursor:pointer;color:var(--ink)}
+.seg button.on{background:var(--green);border-color:var(--green);color:#fff}
+.course{margin:12px 0 4px;font:700 15px Fraunces,serif;color:var(--red);display:flex;justify-content:space-between}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:10px;margin:6px 0;cursor:pointer;background:#fff}
+.opt.on{border-color:var(--green);background:#eef5f1}
+.opt input{margin-top:3px;accent-color:var(--green)}
+.opt .n{flex:1}
+.opt .p{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{font-size:11px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:11px;padding:12px 16px;font:600 15px Inter;cursor:pointer;text-decoration:none}
+.btn.primary{background:var(--red);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.ghost{background:var(--soft);color:var(--green)}
+.btn.small{padding:7px 11px;font-size:13px;border-radius:9px}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row .btn{flex:1 1 150px}
+.total{display:flex;justify-content:space-between;font-weight:600;padding:4px 2px 12px}
+.muted{color:var(--muted);font-size:13px}
+.note{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:13px;color:#4c544f;margin:10px 0}
+.ok{background:#e7f3ec;color:var(--green)}
+.err{background:#fbe9e9;color:var(--red)}
+pre.msg{white-space:pre-wrap;background:#fff;border:1px dashed var(--line);border-radius:10px;padding:10px;font:13px/1.45 ui-monospace,Menlo,monospace;max-height:220px;overflow:auto;word-break:break-word}
+h2{font:700 20px Fraunces,serif;margin:4px 0 10px;color:var(--green)}
+h3{font:700 16px Fraunces,serif;margin:14px 0 6px;color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.fam{border-top:1px solid var(--line);padding:12px 0}
+.fam:first-child{border-top:0;padding-top:0}
+.fam-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fam-h b{font:700 16px Fraunces,serif}
+.pp{font-size:13.5px;margin:3px 0;color:#38423d}
+.stat{display:flex;gap:10px;margin-bottom:12px}
+.stat div{flex:1;background:var(--soft);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font:700 22px Fraunces,serif;color:var(--green)}
+.hidden{display:none!important}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <svg class="stars" viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice"><g fill="#fff">
+    <circle cx="30" cy="20" r="2"/><circle cx="90" cy="60" r="1.5"/><circle cx="150" cy="25" r="2.5"/><circle cx="220" cy="80" r="1.5"/><circle cx="280" cy="18" r="2"/><circle cx="350" cy="55" r="2.5"/><circle cx="380" cy="110" r="1.5"/><circle cx="60" cy="110" r="2"/><circle cx="310" cy="120" r="1.5"/></g></svg>
+  <div style="font-size:26px">🎄</div>
+  <h1>Christmas Dinner</h1>
+  <p>Pick a starter, main and pudding for everyone in your family</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button id="tab-form" class="on">Our choices</button>
+    <button id="tab-all">All families</button>
+  </div>
+
+  <!-- FORM -->
+  <section id="view-form">
+    <div class="card">
+      <label class="f" for="famName">Family name</label>
+      <input type="text" id="famName" placeholder="e.g. The Smiths" autocomplete="off">
+      <div class="note" style="margin-bottom:0">Adults choose from the <b>Festive Menu</b>. Children can choose from the <b>Children's Festive Menu</b> or the regular <b>Kids Menu</b>.</div>
+    </div>
+    <div id="people"></div>
+    <div class="row" style="margin-bottom:14px">
+      <button class="btn ghost" id="addAdult">＋ Add an adult</button>
+      <button class="btn ghost" id="addChild">＋ Add a child</button>
+    </div>
+    <div class="card">
+      <div class="course" style="margin-top:0"><span>For the table (optional)</span></div>
+      <div class="muted">Sides to share with your family</div>
+      <div id="sides"></div>
+    </div>
+    <div class="card">
+      <div class="total"><span>Children's food + sides</span><span id="famTotal">£0.00</span></div>
+      <button class="btn primary" id="saveBtn" style="width:100%">Send our choices</button>
+      <div id="formStatus"></div>
+      <button class="btn ghost small hidden" id="newFamBtn" style="margin-top:10px">Start a new family</button>
+    </div>
+  </section>
+
+  <!-- ALL -->
+  <section id="view-all" class="hidden">
+    <div id="noAccess" class="card">
+      <h2>Organiser only</h2>
+      <p class="muted" style="margin-top:0">Enter the organiser PIN to see everyone's choices.</p>
+      <div class="row"><input type="text" id="pinInput" inputmode="numeric" placeholder="PIN" style="flex:1 1 120px" autocomplete="off"><button class="btn green" id="pinBtn" style="flex:0 0 auto">Unlock</button></div>
+      <div id="pinStatus"></div>
+    </div>
+    <div id="allBody" class="hidden">
+      <div class="row" style="margin-bottom:10px"><button class="btn ghost small" id="refreshBtn" style="flex:0 0 auto">↻ Refresh</button><span class="muted" id="loadNote" style="align-self:center"></span></div>
+      <div class="stat"><div><b id="sFam">0</b>families</div><div><b id="sKids">0</b>children</div><div><b id="sAdults">0</b>adults</div></div>
+
+      <div class="card">
+        <h2>Order for the pub</h2>
+        <div id="tally"></div>
+        <div class="row" style="margin-top:12px"><button class="btn primary" id="copyOrder">Copy order summary</button></div>
+      </div>
+
+      <div class="card">
+        <h2>Families</h2>
+        <div id="famList"></div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+// ---------- MENUS ----------
+const MENUS = {
+  adult: {
+    label: "Festive Menu",
+    short: "Festive",
+    adultOnly: true,
+    courses: {
+      starter: [
+        {id:"a_soup",   n:"Iron Bark pumpkin soup, herb crème fraîche", t:"vg"},
+        {id:"a_beet",   n:"Cheltenham beetroot, goat's curd, hazelnuts, pomegranate molasses", t:"v/gf"},
+        {id:"a_salmon", n:"Cured Scottish salmon, celeriac remoulade, caperberries", t:"gf"},
+        {id:"a_terrine",n:"Confit duck & pork terrine, pear chutney, sourdough"}
+      ],
+      main: [
+        {id:"a_pith",   n:"Mushroom, creamed spinach & truffle pithivier, porcini sauce", t:"vg"},
+        {id:"a_bream",  n:"Roast fillet of sea bream, winter kale, crushed potatoes, crab & lobster sauce", t:"gf"},
+        {id:"a_turkey", n:"Norfolk Bronze turkey, roast root vegetables, pigs in blankets, sage & chestnut stuffing", t:"gf"},
+        {id:"a_rib",    n:"Treacle braised short rib, beef fat carrot, mash, sprout tops, horseradish"}
+      ],
+      pudding: [
+        {id:"a_strudel",n:"Bramley apple, quince & walnut strudel, whipped cinnamon cream", t:"v"},
+        {id:"a_xpud",   n:"Christmas pudding, clementine custard", t:"v"},
+        {id:"a_delice", n:"Chocolate & orange delice, vanilla ice cream", t:"vg/gf"},
+        {id:"a_cheese", n:"Blue Monday, chutney, grapes, fig crackers", t:"v"}
+      ]
+    }
+  },
+  festive: {
+    label: "Children's Festive Menu",
+    short: "Festive",
+    courses: {
+      starter: [
+        {id:"f_soup",  n:"Roast squash soup, bread roll", t:"vg", p:6},
+        {id:"f_trout", n:"Smoked Chalk Stream trout, brown bread & butter", p:7},
+        {id:"f_croq",  n:"Short rib croquettes, mayonnaise", p:6}
+      ],
+      main: [
+        {id:"f_pasta",  n:"Fusilli pasta, pumpkin & Parmesan", t:"v", p:7},
+        {id:"f_haddock",n:"Beer battered haddock, peas, fries, lemon mayonnaise", p:9.5},
+        {id:"f_turkey", n:"Roast Norfolk turkey, carrot, pig in blanket, roast potatoes, gravy", p:12}
+      ],
+      pudding: [
+        {id:"f_brownie",n:"Triple chocolate brownie, vanilla ice cream", t:"v, n", p:5},
+        {id:"f_stp",    n:"Sticky toffee pudding, butterscotch sauce, vanilla ice cream", t:"v", p:5},
+        {id:"f_xpud",   n:"Christmas pudding, clementine custard", t:"v, n", p:6}
+      ]
+    }
+  },
+  kids: {
+    label: "Kids Menu",
+    short: "Kids",
+    courses: {
+      starter: [
+        {id:"k_garlic", n:"Garlic bread", p:5}
+      ],
+      main: [
+        {id:"k_penne",  n:"Penne pasta, tomato & green veg sauce", t:"vg", p:7},
+        {id:"k_fish",   n:"Fish & chips, garden peas, lemon mayonnaise", p:10},
+        {id:"k_hotdog", n:"Hot dog, brioche roll, fries", p:9},
+        {id:"k_gouj_p", n:"Chicken goujons, garden peas, fries", t:"gf", p:9},
+        {id:"k_gouj_s", n:"Chicken goujons, salad, fries", t:"gf", p:9},
+        {id:"k_roast",  n:"Mini roast (Sundays only)", p:12}
+      ],
+      pudding: [
+        {id:"k_cookie", n:"Chocolate chip cookie, vanilla ice cream", p:5.5},
+        {id:"k_mousse", n:"Chocolate mousse, chantilly cream", t:"gf", p:5.5},
+        {id:"k_ice",    n:"Ice creams & sorbets", t:"gf", p:3}
+      ]
+    }
+  }
+};
+const SIDES = [
+  {id:"s_cabbage", n:"Braised red cabbage", t:"vg", p:6},
+  {id:"s_cauli",   n:"Truffled cauliflower cheese", t:"v", p:7.5}
+];
+const KID_MENUS = Object.entries(MENUS).filter(([k,m])=>!m.adultOnly);
+const COURSES = [["starter","Starter"],["main","Main"],["pudding","Pudding"]];
+const DISH = {};
+for (const [mk,m] of Object.entries(MENUS)) for (const [ck,list] of Object.entries(m.courses)) for (const d of list) DISH[d.id] = {...d, menu:mk, course:ck};
+
+// ---------- STATE ----------
+let fam = blankFamily();
+let editingId = null;          // db doc id when editing a saved family
+let allFamilies = [];
+function blankFamily(){ return {family:"", people:[newPerson("adult")], sides:{}}; }
+function newPerson(kind){ return {name:"", kind, menu: kind==="child" ? "festive" : "adult", starter:"", main:"", pudding:"", notes:""}; }
+
+try { const d = localStorage.getItem("xmas-draft2"); if (d) { const o = JSON.parse(d); if (o && Array.isArray(o.people)) fam = cleanFamily(o); } } catch(e){}
+function saveDraft(){ try { localStorage.setItem("xmas-draft2", JSON.stringify(fam)); } catch(e){} }
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const gbp = n => "£" + n.toFixed(2);
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove("show"),1800); }
+
+// ---------- FORM RENDER ----------
+function renderForm(){
+  $("famName").value = fam.family;
+  const host = $("people"); host.innerHTML = "";
+  fam.people.forEach((p, i) => {
+    const c = document.createElement("div"); c.className = "card person";
+    let h = `<div class="person-head"><div class="grow"><label class="f">${p.kind==="child"?"Child":"Adult"} ${i+1} – name</label>
+      <input type="text" data-i="${i}" data-k="name" value="${esc(p.name)}" placeholder="Name"></div>
+      ${fam.people.length>1?`<button class="x" data-del="${i}" aria-label="Remove">×</button>`:""}</div>`;
+    if (p.kind === "child") {
+      h += `<div class="seg">${KID_MENUS.map(([k,m])=>`<button data-menu="${k}" data-i="${i}" class="${p.menu===k?"on":""}">${m.label}</button>`).join("")}</div>`;
+    } else {
+      h += `<div class="muted" style="margin-bottom:4px">Adult Festive Menu</div>`;
+    }
+    const m = MENUS[p.menu];
+    for (const [ck, cl] of COURSES) {
+      h += `<div class="course"><span>${cl}</span></div>`;
+      for (const d of m.courses[ck]) {
+        h += `<label class="opt ${p[ck]===d.id?"on":""}"><input type="radio" name="p${i}${ck}" data-i="${i}" data-c="${ck}" value="${d.id}" ${p[ck]===d.id?"checked":""}>
+          <span class="n">${esc(d.n)} ${d.t?`<span class="tag">(${d.t})</span>`:""}</span>${d.p!=null?`<span class="p">${gbp(d.p)}</span>`:""}</label>`;
+      }
+      h += `<label class="opt ${p[ck]==="none"?"on":""}"><input type="radio" name="p${i}${ck}" data-i="${i}" data-c="${ck}" value="none" ${p[ck]==="none"?"checked":""}><span class="n muted">No ${cl.toLowerCase()}</span></label>`;
+    }
+    h += `<label class="f" style="margin-top:12px">Allergies / notes</label><input type="text" data-i="${i}" data-k="notes" value="${esc(p.notes)}" placeholder="Optional">`;
+    c.innerHTML = h; host.appendChild(c);
+  });
+  $("sides").innerHTML = SIDES.map(s => {
+    const q = fam.sides?.[s.id] || 0;
+    return `<div class="opt" style="align-items:center;cursor:default"><span class="n">${esc(s.n)} <span class="tag">(${s.t})</span> <span class="p">${gbp(s.p)}</span></span>
+      <button class="btn ghost small" data-side="${s.id}" data-d="-1" aria-label="Less">−</button><b style="min-width:18px;text-align:center">${q}</b><button class="btn ghost small" data-side="${s.id}" data-d="1" aria-label="More">＋</button></div>`;
+  }).join("");
+  updateSummary();
+}
+
+function personTotal(p){ if (p.kind!=="child") return 0; return ["starter","main","pudding"].reduce((s,c)=>s+(DISH[p[c]]?.p||0),0); }
+function sidesTotal(f){ return SIDES.reduce((s,x)=>s+(f.sides?.[x.id]||0)*x.p,0); }
+function sidesText(f){ return SIDES.filter(s=>f.sides?.[s.id]).map(s=>`${f.sides[s.id]} × ${s.n}`).join(", "); }
+function dishName(p, c){ if (p[c]==="none") return "none"; return DISH[p[c]]?.n || "not chosen"; }
+
+function buildMessage(f){
+  const lines = [`🎄 Christmas dinner choices – ${f.family || "(family name)"}`, ""];
+  f.people.forEach(p => {
+    const who = p.kind==="child" ? `child, ${MENUS[p.menu].short} menu` : "adult";
+    lines.push(`• ${p.name || "(no name)"} (${who})`);
+    for (const [ck, cl] of COURSES) lines.push(`   ${cl}: ${dishName(p, ck)}`);
+    if (p.notes) lines.push(`   Notes: ${p.notes}`);
+  });
+  if (sidesText(f)) lines.push("", `For the table: ${sidesText(f)}`);
+  const code = btoa(unescape(encodeURIComponent(JSON.stringify({v:2, family:f.family, people:f.people, sides:f.sides||{}}))));
+  lines.push("", "Organiser code: XMAS1:" + code);
+  return lines.join("\n");
+}
+
+function updateSummary(){
+  $("famTotal").textContent = gbp(fam.people.reduce((s,p)=>s+personTotal(p),0) + sidesTotal(fam));
+  saveDraft();
+}
+
+function missing(){
+  const out = [];
+  if (!fam.family.trim()) out.push("family name");
+  fam.people.forEach((p,i)=>{
+    const nm = p.name || `person ${i+1}`;
+    if (!p.name.trim()) out.push(`name for person ${i+1}`);
+    for (const [ck,cl] of COURSES) if (!p[ck]) out.push(`${cl.toLowerCase()} for ${nm}`);
+  });
+  return out;
+}
+function status(el, text, cls){ $(el).innerHTML = text ? `<div class="note ${cls||""}">${text}</div>` : ""; }
+
+// events
+$("famName").addEventListener("input", e => { fam.family = e.target.value; updateSummary(); });
+$("people").addEventListener("input", e => { const t=e.target; if (t.dataset.k) { fam.people[+t.dataset.i][t.dataset.k] = t.value; updateSummary(); } });
+$("people").addEventListener("change", e => {
+  const t=e.target; if (t.type==="radio") { fam.people[+t.dataset.i][t.dataset.c] = t.value; renderForm(); }
+});
+$("people").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.del) { fam.people.splice(+b.dataset.del,1); renderForm(); }
+  if (b.dataset.menu) { const p = fam.people[+b.dataset.i]; if (p.menu!==b.dataset.menu){ p.menu=b.dataset.menu; p.starter=p.main=p.pudding=""; renderForm(); } }
+});
+$("sides").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  fam.sides = fam.sides || {}; fam.sides[b.dataset.side] = Math.max(0, Math.min(20, (fam.sides[b.dataset.side]||0) + (+b.dataset.d)));
+  renderForm();
+});
+$("addChild").onclick = () => { fam.people.push(newPerson("child")); renderForm(); };
+$("addAdult").onclick = () => { fam.people.push(newPerson("adult")); renderForm(); };
+$("newFamBtn").onclick = () => { fam = blankFamily(); editingId = null; if (!pin) { mine = null; try { localStorage.removeItem("xmas-mine"); } catch(e){} } $("saveBtn").textContent = "Send our choices"; status("formStatus",""); $("newFamBtn").classList.add("hidden"); renderForm(); window.scrollTo(0,0); };
+
+// tabs
+function show(which){
+  $("tab-form").classList.toggle("on", which==="form"); $("tab-all").classList.toggle("on", which==="all");
+  $("view-form").classList.toggle("hidden", which!=="form"); $("view-all").classList.toggle("hidden", which!=="all");
+}
+$("tab-form").onclick = () => show("form");
+$("tab-all").onclick = () => show("all");
+
+// ---------- SHARED LIST (db) ----------
+function normName(s){ return String(s||"").trim().toLowerCase().replace(/^the\s+/,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "family"; }
+function cleanFamily(o){
+  const people = (Array.isArray(o.people)?o.people:[]).slice(0,30).map(p=>{
+    const kind = p.kind==="adult"?"adult":"child";
+    const menu = kind==="child" ? ((MENUS[p.menu]&&!MENUS[p.menu].adultOnly)?p.menu:"festive") : "adult";
+    const pick = (c)=> (p[c]==="none"||(DISH[p[c]]&&DISH[p[c]].menu===menu&&DISH[p[c]].course===c))?p[c]:"";
+    return {name:String(p.name||"").slice(0,80), kind, menu, starter:pick("starter"), main:pick("main"), pudding:pick("pudding"), notes:String(p.notes||"").slice(0,300)};
+  });
+  const sides = {}; for (const s of SIDES) { const q = Math.floor(+(o.sides?.[s.id])||0); if (q>0) sides[s.id] = Math.min(q,20); }
+  return {family:String(o.family||"").slice(0,80), people, sides};
+}
+// ---- Google Sheet backend ----
+const API = (window.XMAS_CONFIG && window.XMAS_CONFIG.apiUrl) || "";
+let pin = ""; try { pin = localStorage.getItem("xmas-pin") || ""; } catch(e){}
+let mine = null; try { mine = JSON.parse(localStorage.getItem("xmas-mine") || "null"); } catch(e){}
+async function api(body){
+  if (!API) throw {error:"not_configured"};
+  let r;
+  try { r = await fetch(API, {method:"POST", body: JSON.stringify(body)}); }
+  catch(e){ throw {error:"network"}; }
+  let j; try { j = await r.json(); } catch(e){ throw {error:"bad_response"}; }
+  if (!j.ok) throw j;
+  return j;
+}
+function summaryText(f){
+  return f.people.map(p => `${p.name} (${p.kind==="child"?"child, "+MENUS[p.menu].short+" menu":"adult"}): ${COURSES.map(([c])=>dishName(p,c)).join(" / ")}${p.notes?" – "+p.notes:""}`).join("\n")
+    + (sidesText(f) ? "\nFor the table: " + sidesText(f) : "");
+}
+function failText(e){
+  if (e && e.error==="not_configured") return "The website isn't connected to the sheet yet – please tell the organiser.";
+  if (e && e.error==="network") return "Couldn't reach the server. Check your connection and try again.";
+  if (e && (e.error==="denied"||e.error==="not_found")) return "This entry was changed by the organiser – start a new family or ask them to edit it.";
+  return "Something went wrong saving. Please try again.";
+}
+$("saveBtn").onclick = async () => {
+  const m = missing(); if (m.length) { status("formStatus", "Still to fill in: " + esc(m.join(", ")), "err"); return; }
+  const clean = cleanFamily(fam);
+  const body = {action:"save", data:clean, summary:summaryText(clean)};
+  if (editingId) { body.id = editingId; body.pin = pin; }            // organiser editing any family
+  else if (mine && mine.id) { body.id = mine.id; body.token = mine.token; }  // family updating their own
+  $("saveBtn").disabled = true; $("saveBtn").textContent = "Sending…";
+  try {
+    const r = await api(body);
+    if (!editingId) { mine = {id:r.id, token:r.token}; try { localStorage.setItem("xmas-mine", JSON.stringify(mine)); } catch(e){} }
+    status("formStatus", `Thank you! Choices for ${esc(clean.family)} have been sent ✓<br><span class="muted">Need to change something? Come back on this phone, edit and send again.</span>`, "ok");
+    $("newFamBtn").classList.remove("hidden");
+    if (pin) loadAll();
+  } catch(e){ status("formStatus", failText(e), "err"); }
+  $("saveBtn").disabled = false; $("saveBtn").textContent = (mine && !editingId) ? "Update our choices" : "Send our choices";
+};
+$("pinBtn").onclick = async () => {
+  const p = $("pinInput").value.trim(); if (!p) return;
+  $("pinBtn").disabled = true;
+  try { await api({action:"checkpin", pin:p}); pin = p; try { localStorage.setItem("xmas-pin", p); } catch(e){} status("pinStatus",""); applyAccess(); loadAll(); }
+  catch(e){ status("pinStatus", e && e.error ? failText(e) : "That PIN isn't right.", "err"); }
+  $("pinBtn").disabled = false;
+};
+$("refreshBtn").onclick = () => loadAll();
+async function loadAll(){
+  if (!pin) return;
+  $("loadNote").textContent = "Loading…";
+  try { const r = await api({action:"list", pin}); allFamilies = (r.families||[]).map(f => ({id:f.id, ...cleanFamily(f)})).sort((a,b)=>a.family.localeCompare(b.family)); $("loadNote").textContent = "Updated " + new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); renderAll(); }
+  catch(e){
+    if (e && e.error==="pin") { pin = ""; try { localStorage.removeItem("xmas-pin"); } catch(x){} applyAccess(); status("pinStatus","Please enter the PIN again.","err"); }
+    else $("loadNote").textContent = failText(e);
+  }
+}
+function applyAccess(){
+  $("noAccess").classList.toggle("hidden", !!pin);
+  $("allBody").classList.toggle("hidden", !pin);
+  renderAll();
+}
+
+function renderAll(){
+  const fams = allFamilies;
+  let kids=0, adults=0; const counts = {}; let total = 0; const notes = []; const sideCounts = {};
+  for (const f of fams) {
+    total += sidesTotal(f); for (const s of SIDES) if (f.sides?.[s.id]) sideCounts[s.id] = (sideCounts[s.id]||0) + f.sides[s.id];
+    for (const p of f.people) {
+      if (p.kind==="child") { kids++; total += personTotal(p); } else adults++;
+      for (const c of ["starter","main","pudding"]) if (DISH[p[c]]) counts[p[c]] = (counts[p[c]]||0)+1;
+      if (p.notes) notes.push(`${p.name||"?"} (${f.family}): ${p.notes}`);
+    }
+  }
+  $("sFam").textContent = fams.length; $("sKids").textContent = kids; $("sAdults").textContent = adults;
+
+  let h = "";
+  for (const [mk, m] of Object.entries(MENUS)) {
+    const rows = COURSES.map(([ck,cl]) => {
+      const r = m.courses[ck].filter(d=>counts[d.id]).map(d=>`<tr><td>${esc(d.n)}</td><td class="num"><b>${counts[d.id]}</b></td></tr>`).join("");
+      return r ? `<tr><th colspan="2" style="color:var(--green)">${cl}</th></tr>${r}` : "";
+    }).join("");
+    if (rows) h += `<h3>${m.adultOnly?"Adults – Festive Menu":m.label}</h3><table>${rows}</table>`;
+  }
+  const sr = SIDES.filter(s=>sideCounts[s.id]).map(s=>`<tr><td>${esc(s.n)}</td><td class="num"><b>${sideCounts[s.id]}</b></td></tr>`).join("");
+  if (sr) h += `<h3>For the table</h3><table>${sr}</table>`;
+  if (notes.length) h += `<h3>Allergies / notes</h3>` + notes.map(l=>`<div class="pp">${esc(l)}</div>`).join("");
+  if (!h) h = `<p class="muted">No choices yet.</p>`; else h += `<p class="muted" style="margin-top:10px">Children's food + sides: <b>${gbp(total)}</b> (adult menu price not included)</p>`;
+  $("tally").innerHTML = h;
+
+  const w = !!pin;
+  $("famList").innerHTML = fams.length ? fams.map(f => `<div class="fam"><div class="fam-h"><b>${esc(f.family||"(no name)")}</b>
+     ${w?`<span class="row" style="flex:0 0 auto"><button class="btn ghost small" data-edit="${esc(f.id)}">Edit</button><button class="btn ghost small" data-rm="${esc(f.id)}">Remove</button></span>`:""}</div>
+     ${f.people.map(p=>`<div class="pp"><b>${esc(p.name||"?")}</b> <span class="tag">${p.kind==="child"?"child, "+MENUS[p.menu].short+" menu":"adult"}</span> — ${COURSES.map(([c])=>esc(dishName(p,c))).join(" · ")}${p.notes?` <span class="tag">(${esc(p.notes)})</span>`:""}</div>`).join("")}
+     ${sidesText(f)?`<div class="pp tag">For the table: ${esc(sidesText(f))}</div>`:""}</div>`).join("")
+     : `<p class="muted">Nobody yet. Families can send their choices by WhatsApp, and you paste them in above.</p>`;
+}
+
+$("famList").addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.edit) {
+    const f = allFamilies.find(x=>x.id===b.dataset.edit); if (!f) return;
+    fam = JSON.parse(JSON.stringify({family:f.family, people:f.people, sides:f.sides||{}})); editingId = f.id;
+    renderForm(); show("form"); status("formStatus", `Editing ${esc(f.family)} – press Send when done.`); $("newFamBtn").classList.remove("hidden"); window.scrollTo(0,0);
+  }
+  if (b.dataset.rm) {
+    if (b.dataset.sure) { try { await api({action:"delete", id:b.dataset.rm, pin}); toast("Removed"); loadAll(); } catch(err){ toast(failText(err)); } }
+    else { b.dataset.sure = "1"; b.textContent = "Sure?"; b.style.color = "var(--red)"; setTimeout(()=>{ b.dataset.sure=""; b.textContent="Remove"; b.style.color=""; }, 3000); }
+  }
+});
+
+function orderText(){
+  const lines = ["Christmas dinner – food order", ""];
+  const counts = {}; const sc = {}; let kids=0, adults=0;
+  for (const f of allFamilies) {
+    for (const s of SIDES) if (f.sides?.[s.id]) sc[s.id] = (sc[s.id]||0) + f.sides[s.id];
+    for (const p of f.people) { if (p.kind==="child") kids++; else adults++; for (const c of ["starter","main","pudding"]) if (DISH[p[c]]) counts[p[c]]=(counts[p[c]]||0)+1; }
+  }
+  lines.push(`${adults} adults, ${kids} children`, "");
+  for (const [mk,m] of Object.entries(MENUS)) {
+    const blk = [];
+    for (const [ck,cl] of COURSES) { const ds = m.courses[ck].filter(d=>counts[d.id]); if (ds.length){ blk.push(cl+":"); ds.forEach(d=>blk.push(`  ${counts[d.id]} × ${d.n}`)); } }
+    if (blk.length) lines.push((m.adultOnly?"ADULTS – FESTIVE MENU":m.label.toUpperCase()), ...blk, "");
+  }
+  const sl = SIDES.filter(s=>sc[s.id]).map(s=>`  ${sc[s.id]} × ${s.n}`);
+  if (sl.length) lines.push("FOR THE TABLE", ...sl, "");
+  const nt = [];
+  for (const f of allFamilies) for (const p of f.people) if (p.notes) nt.push(`  ${p.name} (${f.family}): ${p.notes}`);
+  if (nt.length) lines.push("ALLERGIES / NOTES", ...nt, "");
+  lines.push("BY PERSON");
+  for (const f of allFamilies) for (const p of f.people) lines.push(`  ${p.name} (${f.family}): ${COURSES.map(([c])=>dishName(p,c)).join(" / ")}`);
+  return lines.join("\n");
+}
+$("copyOrder").onclick = async () => { try { await navigator.clipboard.writeText(orderText()); toast("Order copied"); } catch(e){ toast("Couldn't copy"); } };
+
+// ---------- BOOT ----------
+renderForm();
+applyAccess();
+if (mine) $("saveBtn").textContent = "Update our choices";
+if (pin) loadAll();
+if (!API) status("formStatus", "Not connected to the sheet yet.", "err");
+</script>
+</body>
+</html>
