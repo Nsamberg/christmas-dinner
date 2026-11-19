@@ -85,7 +85,6 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
   <nav class="menus" aria-label="View the menus">
     <a href="menus/festive-menu.jpg" target="_blank" rel="noopener">📜 Festive Menu</a>
     <a href="menus/childrens-festive-menu.pdf" target="_blank" rel="noopener">🎄 Children's Festive Menu</a>
-    <a href="menus/kids-menu.pdf" target="_blank" rel="noopener">🍟 Kids Menu</a>
   </nav>
 </header>
 
@@ -105,7 +104,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
     <div class="card">
       <label class="f" for="famName">Family name</label>
       <input type="text" id="famName" placeholder="e.g. The Smiths" autocomplete="off">
-      <div class="note" style="margin-bottom:0">Adults choose from the <b>Festive Menu</b>. Children can choose from the <b>Children's Festive Menu</b> or the regular <b>Kids Menu</b>.</div>
+      <div class="note" style="margin-bottom:0">Adults choose from the <b>Festive Menu</b> and children from the <b>Children's Festive Menu</b>.</div>
     </div>
     <div id="people"></div>
     <div class="row" style="margin-bottom:14px">
@@ -201,28 +200,6 @@ const MENUS = {
         {id:"f_xpud",   n:"Christmas pudding, clementine custard", t:"v, n", p:6}
       ]
     }
-  },
-  kids: {
-    label: "Kids Menu",
-    short: "Kids",
-    courses: {
-      starter: [
-        {id:"k_garlic", n:"Garlic bread", p:5}
-      ],
-      main: [
-        {id:"k_penne",  n:"Penne pasta, tomato & green veg sauce", t:"vg", p:7},
-        {id:"k_fish",   n:"Fish & chips, garden peas, lemon mayonnaise", p:10},
-        {id:"k_hotdog", n:"Hot dog, brioche roll, fries", p:9},
-        {id:"k_gouj_p", n:"Chicken goujons, garden peas, fries", t:"gf", p:9},
-        {id:"k_gouj_s", n:"Chicken goujons, salad, fries", t:"gf", p:9},
-        {id:"k_roast",  n:"Mini roast (Sundays only)", p:12}
-      ],
-      pudding: [
-        {id:"k_cookie", n:"Chocolate chip cookie, vanilla ice cream", p:5.5},
-        {id:"k_mousse", n:"Chocolate mousse, chantilly cream", t:"gf", p:5.5},
-        {id:"k_ice",    n:"Ice creams & sorbets", t:"gf", p:3}
-      ]
-    }
   }
 };
 const SIDES = [
@@ -260,10 +237,9 @@ function renderForm(){
       <input type="text" data-i="${i}" data-k="name" value="${esc(p.name)}" placeholder="Name"></div>
       ${fam.people.length>1?`<button class="x" data-del="${i}" aria-label="Remove">×</button>`:""}</div>`;
     if (p.kind === "child") {
-      h += `<div class="seg">${KID_MENUS.map(([k,m])=>`<button data-menu="${k}" data-i="${i}" class="${p.menu===k?"on":""}">${m.label}</button>`).join("")}</div>`;
-    } else {
-      h += `<div class="muted" style="margin-bottom:4px">Adult Festive Menu</div>`;
+      if (KID_MENUS.length > 1) h += `<div class="seg">${KID_MENUS.map(([k,m])=>`<button data-menu="${k}" data-i="${i}" class="${p.menu===k?"on":""}">${m.label}</button>`).join("")}</div>`;
     }
+    h += `<div class="muted" style="margin-bottom:4px">${p.kind==="child" ? "Children's Festive Menu" : "Festive Menu"}</div>`;
     const m = MENUS[p.menu];
     for (const [ck, cl] of COURSES) {
       h += `<div class="course"><span>${cl}</span></div>`;
